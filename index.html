@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>Pokémon Idle - La Gran Aventura Automática</title>
+  <style>
+    body {
+      font-family: 'Arial Rounded MT Bold', 'Arial', sans-serif;
+      background: #f5f5f5;
+      padding: 20px;
+      max-width: 900px;
+      margin: 0 auto;
+      color: #333;
+    }
+    h1 { color: #e74c3c; text-align: center; }
+    .stats { display: flex; gap: 20px; margin: 20px 0; flex-wrap: wrap; }
+    .stat-box {
+      background: #fff;
+      border: 2px solid #ddd;
+      border-radius: 10px;
+      padding: 15px;
+      width: 200px;
+      box-shadow: 0 3px 6px rgba(0,0,0,0.1);
+      text-align: center;
+    }
+    .roles { display: flex; gap: 20px; margin: 30px 0; flex-wrap: wrap; }
+    .role-box {
+      background: #e8f4fc;
+      border: 2px solid #a0d8f1;
+      border-radius: 10px;
+      padding: 15px;
+      width: 280px;
+      box-shadow: 0 3px 6px rgba(0,0,0,0.1);
+    }
+    .team-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+      gap: 15px;
+      margin-top: 30px;
+    }
+    .pokemon-card {
+      background: white;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      padding: 10px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .pokemon-card:hover {
+      transform: scale(1.05);
+      box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    }
+    .pokemon-card.active {
+      background: #c8e6c9;
+      border-color: #4caf50;
+      font-weight: bold;
+    }
+    .level { font-size: 0.9em; color: #555; }
+    button {
+      background: #4caf50;
+      color: white;
+      border: none;
+      padding: 8px 15px;
+      border-radius: 5px;
+      cursor: pointer;
+      margin-top: 10px;
+    }
+    button:hover { background: #388e3c; }
+  </style>
+</head>
+<body>
+  <h1>🌿 Pokémon Idle: La Gran Aventura Automática</h1>
+
+  <div class="stats">
+    <div class="stat-box">
+      <h3>💰 Monedas</h3>
+      <p id="monedas">0</p>
+    </div>
+    <div class="stat-box">
+      <h3>⚡ XP Global</h3>
+      <p id="xp">0</p>
+    </div>
+    <div class="stat-box">
+      <h3>📦 Poké Balls</h3>
+      <p id="pokeballs">10</p>
+    </div>
+  </div>
+
+  <div class="roles">
+    <div class="role-box">
+      <h3>🌱 Recaudador Activo</h3>
+      <p><strong id="recaudador-nombre">Ninguno</strong></p>
+      <p>Nivel: <span id="recaudador-nivel">0</span></p>
+      <p>Genera: <span id="recaudador-generacion">0</span> monedas/seg</p>
+      <button onclick="abrirSelector('recaudador')">Cambiar Pokémon</button>
+    </div>
+
+    <div class="role-box">
+      <h3>🧠 Científico Activo</h3>
+      <p><strong id="cientifico-nombre">Ninguno</strong></p>
+      <p>Nivel: <span id="cientifico-nivel">0</span></p>
+      <p>Genera: <span id="cientifico-generacion">0</span> XP/seg</p>
+      <button onclick="abrirSelector('cientifico')">Cambiar Pokémon</button>
+    </div>
+
+    <div class="role-box">
+      <h3>🧭 Explorador Activo</h3>
+      <p><strong id="explorador-nombre">Ninguno</strong></p>
+      <p>Nivel: <span id="explorador-nivel">0</span></p>
+      <p>Captura: <span id="explorador-prob">0%</span> cada 5s</p>
+      <button onclick="abrirSelector('explorador')">Cambiar Pokémon</button>
+    </div>
+  </div>
+
+  <h3>📦 Tu Equipo Pokémon</h3>
+  <div id="equipo" class="team-grid">
+    <!-- Aquí se cargan los Pokémon -->
+  </div>
+
+  <!-- Selector Modal (oculto al inicio) -->
+  <div id="selector-modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.7); z-index:100;">
+    <div style="background:white; margin:10% auto; padding:20px; width:80%; max-width:600px; border-radius:10px;">
+      <h3>Selecciona un Pokémon para: <span id="selector-rol-titulo"></span></h3>
+      <div id="selector-lista" class="team-grid"></div>
+      <button onclick="cerrarSelector()" style="margin-top:20px; background:#e74c3c;">Cancelar</button>
+    </div>
+  </div>
+
+  <script>
+    // Estado del juego
+    let juego = {
+      monedas: 0,
+      xp: 0,
+      pokeballs: 10,
+      equipo: [],
+      rolesActivos: {
+        recaudador: null,
+        cientifico: null,
+        explorador: null
+      }
+    };
+
+    // Base de datos de Pokémon (¡Venusaur es mejor que Bulbasaur!)
+    const pokedex = [
+      {
+        id: 1,
+        nombre: "Bulbasaur",
+        nivel: 5,
+        tipo: "planta",
+        rol: "recaudador",
+        habilidad: "+0.8 monedas/seg",
+        generacionBase: 0.8,
+        evolucion: { nivel: 16, a: "Ivysaur", mejora: 1.5 }
+      },
+      {
+        id: 2,
+        nombre: "Ivysaur",
+        nivel: 5,
+        tipo: "planta",
+        rol: "recaudador",
+        habilidad: "+1.5 monedas/seg",
+        generacionBase: 1.5,
+        evolucion: { nivel: 32, a: "Venusaur", mejora: 3.5 }
+      },
+      {
+        id: 3,
+        nombre: "Venusaur",
+        nivel: 5,
+        tipo: "planta",
+        rol: "recaudador",
+        habilidad: "+3.5 monedas/seg + bono equipo planta",
+        generacionBase: 3.5,
+        evolucion: null // ¡Es la forma final!
+      },
+      {
+        id: 4,
+        nombre: "Charmander",
+        nivel: 5,
+        tipo: "fuego",
+        rol: "cientifico",
+        habilidad: "+0.7 XP/seg",
+        generacionBase: 0.7,
+        evolucion: { nivel: 16, a: "Charmeleon", mejora: 1.4 }
+      },
+      {
+        id: 5,
+        nombre: "Charmeleon",
+        nivel: 5,
+        tipo: "fuego",
+        rol: "cientifico",
+        habilidad: "+1.4 XP/seg",
+        generacionBase: 1.4,
+        evolucion: { nivel: 36, a: "Charizard", mejora: 3.0 }
+      },
+      {
+        id: 6,
+        nombre: "Charizard",
+        nivel: 5,
+        tipo: "fuego/volador",
+        rol: "cientifico",
+        habilidad: "+3.0 XP/seg + quemadura en batallas",
+        generacionBase: 3.0,
+        evolucion: null
+      },
+      {
+        id: 7,
+        nombre: "Squirtle",
+        nivel: 5,
+        tipo: "agua",
+        rol: "explorador",
+        habilidad: "20% prob. captura cada 5s",
+        generacionBase: 0.2, // probabilidad
+        evolucion: { nivel: 16, a: "Wartortle", mejora: 0.35 }
+      },
+      {
+        id: 8,
+        nombre: "Wartortle",
+        nivel: 5,
+        tipo: "agua",
+        rol: "explorador",
+        habilidad: "35% prob. captura cada 5s",
+        generacionBase: 0.35,
+        evolucion: { nivel: 36, a: "Blastoise", mejora: 0.6 }
+      },
+      {
+        id: 9,
+        nombre: "Blastoise",
+        nivel: 5,
+        tipo: "agua",
+        rol: "explorador",
+        habilidad: "60% prob. captura + encuentra items raros",
+        generacionBase: 0.6,
+        evolucion: null
+      }
+    ];
+
+    // Inicializar juego
+    function init() {
+      cargarGuardado();
+      actualizarUI();
+      setInterval(tick, 1000); // Motor automático cada segundo
+      setInterval(explorar, 5000); // Explorador actúa cada 5 segundos
+    }
+
+    function tick() {
+      // Generar recursos según roles activos
+      if (juego.rolesActivos.recaudador) {
+        const p = juego.rolesActivos.recaudador;
+        juego.monedas += p.generacionBase * (1 + p.nivel * 0.1); // +10% por nivel
+      }
+      if (juego.rolesActivos.cientifico) {
+        const p = juego.rolesActivos.cientifico;
+        juego.xp += p.generacionBase * (1 + p.nivel * 0.1);
+        // Subir nivel a científico activo
+        p.xp = (p.xp || 0) + p.generacionBase;
+        if (p.xp >= p.nivel * 10) {
+          p.xp = 0;
+          p.nivel++;
+          if (p.evolucion && p.nivel >= p.evolucion.nivel) {
+            evolucionar(p);
+          }
+        }
+      }
+      actualizarUI();
+      guardar();
+    }
+
+    function explorar() {
+      if (juego.rolesActivos.explorador && Math.random() < juego.rolesActivos.explorador.generacionBase) {
+        // Capturar Pokémon aleatorio
+        const aleatorio = pokedex[Math.floor(Math.random() * pokedex.length)];
+        const nuevo = { ...aleatorio, nivel: 1, xp: 0 };
+        juego.equipo.push(nuevo);
+        juego.pokeballs--;
+        alert(`¡Capturaste un ${nuevo.nombre}!`);
+        renderEquipo();
+        guardar();
+      }
+    }
+
+    function evolucionar(pokemon) {
+      const evol = pokedex.find(p => p.nombre === pokemon.evolucion.a);
+      if (evol) {
+        const index = juego.equipo.findIndex(p => p.id === pokemon.id && p.nombre === pokemon.nombre);
+        if (index !== -1) {
+          juego.equipo[index] = { ...evol, nivel: 1, xp: 0 };
+          alert(`¡${pokemon.nombre} evolucionó a ${evol.nombre}!`);
+          // Si estaba activo, actualizar rol activo
+          for (let rol in juego.rolesActivos) {
+            if (juego.rolesActivos[rol] === pokemon) {
+              juego.rolesActivos[rol] = juego.equipo[index];
+            }
+          }
+          renderEquipo();
+          actualizarUI();
+          guardar();
+        }
+      }
+    }
+
+    function asignarActivo(rol, pokemon) {
+      juego.rolesActivos[rol] = pokemon;
+      actualizarUI();
+      cerrarSelector();
+      guardar();
+    }
+
+    function abrirSelector(rol) {
+      document.getElementById('selector-rol-titulo').textContent = rol;
+      const lista = document.getElementById('selector-lista');
+      lista.innerHTML = '';
+      juego.equipo
+        .filter(p => p.rol === rol)
+        .forEach(p => {
+          const div = document.createElement('div');
+          div.className = 'pokemon-card';
+          div.innerHTML = `
+            <strong>${p.nombre}</strong><br>
+            <span class="level">Nv. ${p.nivel}</span><br>
+            ${p.habilidad}
+          `;
+          div.onclick = () => asignarActivo(rol, p);
+          lista.appendChild(div);
+        });
+      document.getElementById('selector-modal').style.display = 'block';
+    }
+
+    function cerrarSelector() {
+      document.getElementById('selector-modal').style.display = 'none';
+    }
+
+    function renderEquipo() {
+      const contenedor = document.getElementById('equipo');
+      contenedor.innerHTML = '';
+      juego.equipo.forEach(p => {
+        const div = document.createElement('div');
+        div.className = 'pokemon-card';
+        if (Object.values(juego.rolesActivos).includes(p)) {
+          div.classList.add('active');
+        }
+        div.innerHTML = `
+          <strong>${p.nombre}</strong><br>
+          <span class="level">Nv. ${p.nivel} - ${p.rol}</span><br>
+          ${p.habilidad}
+        `;
+        contenedor.appendChild(div);
+      });
+    }
+
+    function actualizarUI() {
+      document.getElementById('monedas').textContent = Math.floor(juego.monedas);
+      document.getElementById('xp').textContent = Math.floor(juego.xp);
+      document.getElementById('pokeballs').textContent = juego.pokeballs;
+
+      // Actualizar roles activos
+      for (let rol of ['recaudador', 'cientifico', 'explorador']) {
+        const p = juego.rolesActivos[rol];
+        if (p) {
+          document.getElementById(`${rol}-nombre`).textContent = p.nombre;
+          document.getElementById(`${rol}-nivel`).textContent = p.nivel;
+          if (rol === 'explorador') {
+            document.getElementById(`${rol}-generacion`).textContent = `${(p.generacionBase * 100).toFixed(0)}%`;
+          } else {
+            const gen = (p.generacionBase * (1 + p.nivel * 0.1)).toFixed(2);
+            document.getElementById(`${rol}-generacion`).textContent = gen;
+          }
+        } else {
+          document.getElementById(`${rol}-nombre`).textContent = "Ninguno";
+          document.getElementById(`${rol}-nivel`).textContent = "0";
+          document.getElementById(`${rol}-generacion`).textContent = "0";
+        }
+      }
+    }
+
+    // Guardar y cargar
+    function guardar() {
+      localStorage.setItem('pokemonIdleSave', JSON.stringify(juego));
+    }
+
+    function cargarGuardado() {
+      const guardado = localStorage.getItem('pokemonIdleSave');
+      if (guardado) {
+        const data = JSON.parse(guardado);
+        juego = {
+          ...data,
+          // Reconectar referencias de roles activos al equipo actual
+          rolesActivos: {
+            recaudador: data.rolesActivos.recaudador ? encontrarEnEquipo(data.rolesActivos.recaudador) : null,
+            cientifico: data.rolesActivos.cientifico ? encontrarEnEquipo(data.rolesActivos.cientifico) : null,
+            explorador: data.rolesActivos.explorador ? encontrarEnEquipo(data.rolesActivos.explorador) : null
+          }
+        };
+      } else {
+        // Empezar con iniciales
+        juego.equipo = [
+          { ...pokedex[0], nivel: 5, xp: 0 }, // Bulbasaur
+          { ...pokedex[3], nivel: 5, xp: 0 }, // Charmander
+          { ...pokedex[6], nivel: 5, xp: 0 }  // Squirtle
+        ];
+      }
+    }
+
+    function encontrarEnEquipo(p) {
+      return juego.equipo.find(pk => pk.nombre === p.nombre && pk.nivel === p.nivel);
+    }
+
+    // Iniciar
+    window.onload = init;
+  </script>
+</body>
+</html>
