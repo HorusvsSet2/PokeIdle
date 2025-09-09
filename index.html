@@ -3,113 +3,352 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>🔥 Pokémon Idle ULTIMATE — 1025 Pokémon</title>
+  <title>🌟 Pokémon Idle: Legendary Edition</title>
   <link rel="stylesheet" href="style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
 </head>
 <body>
-  <div class="container">
+  <div class="game-container">
+    <!-- Header con modo noche/día -->
     <div class="header">
-      <h1>🔥 POKÉMON IDLE ULTIMATE</h1>
-      <p>¡Colecciona, entrena y domina a los 1025 Pokémon con datos reales de PokeAPI!</p>
-    </div>
-
-    <div class="stats">
-      <div class="stat-box">
-        <h3>💰 Monedas</h3>
-        <p id="monedas">0</p>
+      <div class="header-left">
+        <div class="title-glow">🌟 POKÉMON IDLE: LEGENDARY</div>
+        <div class="subtitle">La experiencia idle definitiva</div>
       </div>
-      <div class="stat-box">
-        <h3>⚡ XP Global</h3>
-        <p id="xp">0</p>
-      </div>
-      <div class="stat-box">
-        <h3>⭐ Medallas</h3>
-        <p id="medallas">0</p>
+      <div class="header-right">
+        <button id="toggle-theme" class="theme-btn">🌙</button>
+        <button id="export-btn" class="action-btn">📤 Exportar</button>
+        <button id="import-btn" class="action-btn">📥 Importar</button>
       </div>
     </div>
 
+    <!-- HUD de recursos -->
+    <div class="hud">
+      <div class="resource coins">
+        <div class="icon">💰</div>
+        <div class="value" id="monedas">0</div>
+      </div>
+      <div class="resource xp">
+        <div class="icon">⚡</div>
+        <div class="value" id="xp">0</div>
+      </div>
+      <div class="resource medallas">
+        <div class="icon">⭐</div>
+        <div class="value" id="medallas">0</div>
+      </div>
+      <div class="resource prestigio">
+        <div class="icon">🏆</div>
+        <div class="value" id="prestigio">0</div>
+      </div>
+    </div>
+
+    <!-- Tabs con animación -->
     <div class="tabs">
-      <button class="tab-btn active" data-tab="equipo">Mi Equipo</button>
-      <button class="tab-btn" data-tab="tienda">Tienda Pokémon (1025)</button>
-      <button class="tab-btn" data-tab="mejoras">Centro de Mejoras</button>
+      <button class="tab-btn active" data-tab="equipo">🎒 EQUIPO</button>
+      <button class="tab-btn" data-tab="tienda">🏪 TIENDA</button>
+      <button class="tab-btn" data-tab="batallas">🥊 BATALLAS</button>
+      <button class="tab-btn" data-tab="historia">🗺️ HISTORIA</button>
+      <button class="tab-btn" data-tab="huevos">🥚 HUEVOS</button>
+      <button class="tab-btn" data-tab="objetos">💎 OBJETOS</button>
+      <button class="tab-btn" data-tab="prestigio">🏆 PRESTIGIO</button>
+      <button class="tab-btn" data-tab="logros">🏆 LOGROS</button>
     </div>
 
-    <!-- Pestaña: Equipo -->
-    <div id="tab-equipo" class="tab-content active">
-      <h2>📦 Mi Equipo Pokémon</h2>
-      <div id="equipo-grid" class="grid">
-        <!-- Se llena dinámicamente -->
-      </div>
-    </div>
-
-    <!-- Pestaña: Tienda -->
-    <div id="tab-tienda" class="tab-content">
-      <h2>🏪 Tienda de Pokémon — ¡1025 para coleccionar!</h2>
-      
-      <div class="filters">
-        <div class="filter-group">
-          <label for="busqueda">Buscar</label>
-          <input type="text" id="busqueda" placeholder="Nombre o tipo...">
+    <!-- Contenedores de contenido -->
+    <div class="content-area">
+      <!-- Equipo -->
+      <div id="tab-equipo" class="tab-content active">
+        <h2 class="section-title">¡Tus Pokémon Activos!</h2>
+        <div class="active-team">
+          <div id="recaudador-slot" class="pokemon-slot" data-rol="recaudador">
+            <div class="slot-label">💰 Recaudador</div>
+            <div class="slot-content">Arrastra aquí un Pokémon</div>
+          </div>
+          <div id="cientifico-slot" class="pokemon-slot" data-rol="cientifico">
+            <div class="slot-label">⚡ Científico</div>
+            <div class="slot-content">Arrastra aquí un Pokémon</div>
+          </div>
+          <div id="explorador-slot" class="pokemon-slot" data-rol="explorador">
+            <div class="slot-label">🗺️ Explorador</div>
+            <div class="slot-content">Arrastra aquí un Pokémon</div>
+          </div>
+          <div id="luchador-slot" class="pokemon-slot" data-rol="luchador">
+            <div class="slot-label">🥊 Luchador</div>
+            <div class="slot-content">Arrastra aquí un Pokémon</div>
+          </div>
         </div>
-        <div class="filter-group">
-          <label for="filtro-tipo">Tipo</label>
+        
+        <h2 class="section-title">📦 Tu Colección</h2>
+        <div class="search-bar">
+          <input type="text" id="busqueda-equipo" placeholder="Buscar en tu equipo...">
+          <select id="filtro-equipo-rol">
+            <option value="">Todos los roles</option>
+            <option value="recaudador">💰 Recaudador</option>
+            <option value="cientifico">⚡ Científico</option>
+            <option value="explorador">🗺️ Explorador</option>
+            <option value="luchador">🥊 Luchador</option>
+          </select>
+        </div>
+        <div id="equipo-grid" class="pokemon-grid">
+          <div class="loading-message">Compra tu primer Pokémon en la tienda →</div>
+        </div>
+      </div>
+
+      <!-- Tienda -->
+      <div id="tab-tienda" class="tab-content">
+        <h2 class="section-title">🏪 ¡Compra Nuevos Pokémon!</h2>
+        
+        <div class="filters-bar">
+          <input type="text" id="busqueda-tienda" placeholder="Buscar Pokémon...">
           <select id="filtro-tipo">
-            <option value="todos">Todos</option>
-            <option value="fire">Fuego</option>
-            <option value="water">Agua</option>
-            <option value="grass">Planta</option>
-            <option value="electric">Eléctrico</option>
-            <option value="psychic">Psíquico</option>
-            <option value="dragon">Dragón</option>
-            <option value="dark">Siniestro</option>
-            <option value="fairy">Hada</option>
+            <option value="">Todos los tipos</option>
+            <option value="fire">🔥 Fuego</option>
+            <option value="water">💧 Agua</option>
+            <option value="grass">🌿 Planta</option>
+            <option value="electric">⚡ Eléctrico</option>
+            <option value="psychic">🧠 Psíquico</option>
+            <option value="dragon">🐉 Dragón</option>
+            <option value="fairy">✨ Hada</option>
+            <option value="dark">🌑 Siniestro</option>
           </select>
-        </div>
-        <div class="filter-group">
-          <label for="filtro-region">Región</label>
           <select id="filtro-region">
-            <option value="todos">Todas</option>
-            <option value="kanto">Kanto</option>
-            <option value="johto">Johto</option>
-            <option value="hoenn">Hoenn</option>
-            <option value="sinnoh">Sinnoh</option>
-            <option value="teselia">Teselia</option>
-            <option value="kalos">Kalos</option>
-            <option value="alola">Alola</option>
-            <option value="galar">Galar</option>
-            <option value="paldea">Paldea</option>
+            <option value="">Todas las regiones</option>
+            <option value="kanto">📍 Kanto</option>
+            <option value="johto">📍 Johto</option>
+            <option value="hoenn">📍 Hoenn</option>
+            <option value="sinnoh">📍 Sinnoh</option>
+            <option value="teselia">📍 Teselia</option>
+            <option value="kalos">📍 Kalos</option>
+            <option value="alola">📍 Alola</option>
+            <option value="galar">📍 Galar</option>
+            <option value="paldea">📍 Paldea</option>
+          </select>
+          <select id="filtro-rareza">
+            <option value="">Todas las rarezas</option>
+            <option value="comun">Común</option>
+            <option value="raro">Raro</option>
+            <option value="legendario">🌟 Legendario</option>
+            <option value="shiny">✨ Shiny</option>
           </select>
         </div>
-        <div class="filter-group">
-          <label for="filtro-rol">Rol</label>
-          <select id="filtro-rol">
-            <option value="todos">Todos</option>
-            <option value="recaudador">Recaudador</option>
-            <option value="cientifico">Científico</option>
-            <option value="explorador">Explorador</option>
-            <option value="luchador">Luchador</option>
-          </select>
+        
+        <div id="tienda-grid" class="pokemon-grid">
+          <div class="loading-message">Cargando Pokémon...</div>
         </div>
       </div>
-      
-      <div id="tienda-grid" class="grid">
-        <!-- Se llena dinámicamente -->
-      </div>
-    </div>
 
-    <!-- Pestaña: Mejoras -->
-    <div id="tab-mejoras" class="tab-content">
-      <h2>⚙️ Centro de Mejoras</h2>
-      <p>Mejora las habilidades de tus Pokémon activos. ¡Cada nivel aumenta un 50% su efectividad!</p>
-      <div id="mejoras-grid" class="grid">
-        <!-- Se llena dinámicamente -->
+      <!-- Batallas -->
+      <div id="tab-batallas" class="tab-content">
+        <h2 class="section-title">🥊 Arena de Batallas</h2>
+        
+        <div class="battle-arena">
+          <div class="battle-controls">
+            <select id="battle-difficulty">
+              <option value="facil">Fácil (Gimnasio)</option>
+              <option value="normal">Normal (Líder)</option>
+              <option value="dificil">Difícil (Élite)</option>
+              <option value="epico">Épico (Legendario)</option>
+            </select>
+            <button id="start-battle" class="btn-battle">¡COMENZAR BATALLA!</button>
+          </div>
+          
+          <div class="battle-display">
+            <div class="battle-team">
+              <h3>Tu Equipo</h3>
+              <div id="battle-team-display"></div>
+            </div>
+            <div class="battle-vs">VS</div>
+            <div class="battle-enemy">
+              <h3>Rival</h3>
+              <div id="battle-enemy-display">
+                <div class="enemy-placeholder">Selecciona dificultad y comienza batalla</div>
+              </div>
+            </div>
+          </div>
+          
+          <div id="battle-log" class="battle-log">
+            <h3>Registro de Batalla</h3>
+            <div id="battle-messages">¡Prepárate para la batalla!</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Historia -->
+      <div id="tab-historia" class="tab-content">
+        <h2 class="section-title">🗺️ Modo Historia</h2>
+        
+        <div class="story-map">
+          <div class="region-chapter active" data-region="kanto">
+            <div class="chapter-number">1</div>
+            <div class="chapter-title">Región Kanto</div>
+            <div class="chapter-progress">Misiones: <span class="completed">0</span>/5</div>
+            <button class="btn-chapter">Iniciar Capítulo</button>
+          </div>
+          
+          <div class="region-chapter locked" data-region="johto">
+            <div class="chapter-number">2</div>
+            <div class="chapter-title">Región Johto</div>
+            <div class="chapter-progress">🔒 Bloqueado</div>
+            <button class="btn-chapter" disabled>Requiere Capítulo 1</button>
+          </div>
+          
+          <div class="region-chapter locked" data-region="hoenn">
+            <div class="chapter-number">3</div>
+            <div class="chapter-title">Región Hoenn</div>
+            <div class="chapter-progress">🔒 Bloqueado</div>
+            <button class="btn-chapter" disabled>Requiere Capítulo 2</button>
+          </div>
+          
+          <!-- ... más regiones ... -->
+        </div>
+        
+        <div id="current-missions" class="missions-container">
+          <h3>Misiones Actuales</h3>
+          <div id="missions-list">
+            <div class="mission-placeholder">Selecciona un capítulo para ver misiones</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Huevos -->
+      <div id="tab-huevos" class="tab-content">
+        <h2 class="section-title">🥚 Incubadora de Huevos</h2>
+        
+        <div class="eggs-info">
+          <div>Huevos en incubación: <span id="eggs-count">0</span></div>
+          <div>Pasos dados: <span id="steps-count">0</span>/1000</div>
+          <button id="add-egg" class="btn-primary">➕ Añadir Huevo (1000💰)</button>
+        </div>
+        
+        <div class="incubators-container">
+          <div class="incubator-slot" id="incubator-1">
+            <div class="incubator-header">Incubadora 1</div>
+            <div class="incubator-content">Vacía</div>
+          </div>
+          <div class="incubator-slot" id="incubator-2">
+            <div class="incubator-header">Incubadora 2</div>
+            <div class="incubator-content">Vacía</div>
+          </div>
+          <div class="incubator-slot" id="incubator-3">
+            <div class="incubator-header">Incubadora 3</div>
+            <div class="incubator-content">Vacía</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Objetos -->
+      <div id="tab-objetos" class="tab-content">
+        <h2 class="section-title">💎 Objetos y Mejoras</h2>
+        
+        <div class="items-category">
+          <h3>Mejoras Permanentes</h3>
+          <div class="items-grid" id="permanent-items">
+            <!-- Se llenará dinámicamente -->
+          </div>
+        </div>
+        
+        <div class="items-category">
+          <h3>Objetos Equipables</h3>
+          <div class="items-grid" id="equippable-items">
+            <!-- Se llenará dinámicamente -->
+          </div>
+        </div>
+      </div>
+
+      <!-- Prestigio -->
+      <div id="tab-prestigio" class="tab-content">
+        <h2 class="section-title">🏆 Sistema de Prestigio</h2>
+        
+        <div class="prestige-info">
+          <div class="prestige-stats">
+            <div>Monedas necesarias: <span id="prestige-cost">1,000,000</span> 💰</div>
+            <div>Pokémon en equipo: <span id="prestige-pokemon">10</span>+</div>
+            <div>Capítulos completados: <span id="prestige-chapters">1</span>+</div>
+          </div>
+          
+          <div class="prestige-rewards">
+            <h3>Recompensas de Prestigio</h3>
+            <ul>
+              <li>⭐ 1 Medalla de Prestigio</li>
+              <li>🚀 +10% a todas las generaciones</li>
+              <li>💎 Desbloquea objetos especiales</li>
+              <li>🏆 Acceso a Temporada 2</li>
+            </ul>
+          </div>
+          
+          <button id="prestige-btn" class="btn-prestige">¡REINICIAR POR PRESTIGIO!</button>
+        </div>
+        
+        <div class="prestige-perks">
+          <h3>Mejoras Permanentes Adquiridas</h3>
+          <div id="prestige-perks-list">
+            <!-- Se llenará con las mejoras permanentes -->
+          </div>
+        </div>
+      </div>
+
+      <!-- Logros -->
+      <div id="tab-logros" class="tab-content">
+        <h2 class="section-title">🏆 Logros y Estadísticas</h2>
+        
+        <div class="stats-overview">
+          <div class="stat-card">
+            <div class="stat-value" id="total-pokemon-caught">0</div>
+            <div class="stat-label">Pokémon Capturados</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value" id="total-money-earned">0</div>
+            <div class="stat-label">Monedas Ganadas</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value" id="total-battles-won">0</div>
+            <div class="stat-label">Batallas Ganadas</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value" id="shiny-found">0</div>
+            <div class="stat-label">Shiny Encontrados</div>
+          </div>
+        </div>
+        
+        <h3>Logros</h3>
+        <div id="logros-grid" class="logros-grid">
+          <!-- Se llenará dinámicamente -->
+        </div>
       </div>
     </div>
   </div>
 
-  <div class="footer">
-    <p>Usando datos oficiales de <a href="https://pokeapi.co/" target="_blank" style="color: #3b82f6;">PokeAPI</a> • Guardado automático • Hecho con ❤️ para entrenadores Pokémon</p>
+  <!-- Modal de Pokémon -->
+  <div id="pokemon-modal" class="modal">
+    <div class="modal-content">
+      <span class="close-modal">&times;</span>
+      <div id="modal-pokemon-details"></div>
+    </div>
   </div>
+
+  <!-- Modal de Importar -->
+  <div id="import-modal" class="modal">
+    <div class="modal-content">
+      <span class="close-modal">&times;</span>
+      <h2>📥 Importar Guardado</h2>
+      <textarea id="import-data" placeholder="Pega aquí tu código de guardado..." rows="10" style="width: 100%; padding: 15px; margin: 20px 0; background: var(--card); color: var(--text); border: 2px solid var(--primary); border-radius: 10px;"></textarea>
+      <button id="confirm-import" class="btn-primary">Importar Guardado</button>
+    </div>
+  </div>
+
+  <!-- Audio -->
+  <audio id="bg-music" loop>
+    <source src="https://assets.mixkit.co/active_storage/sfx/214/214-preview.mp3" type="audio/mpeg">
+  </audio>
+  <audio id="click-sound">
+    <source src="https://assets.mixkit.co/active_storage/sfx/2566/2566-preview.mp3" type="audio/mpeg">
+  </audio>
+  <audio id="purchase-sound">
+    <source src="https://assets.mixkit.co/active_storage/sfx/2565/2565-preview.mp3" type="audio/mpeg">
+  </audio>
+  <audio id="battle-sound">
+    <source src="https://assets.mixkit.co/active_storage/sfx/2061/2061-preview.mp3" type="audio/mpeg">
+  </audio>
 
   <script src="script.js"></script>
 </body>
