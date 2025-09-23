@@ -8,6 +8,7 @@ const Combat = {
     playerTimerId: null,
     enemyTimerId: null,
     catchEnabled: false,
+
     init: function() {
         if (!this.paused) {
             this.playerActivePoke = player.activePoke();
@@ -16,26 +17,31 @@ const Combat = {
             this.enemyTimer();
         }
     },
+
     pause: function() {
         this.paused = true;
         this.stop();
         enemy.clear();
         this.enemyActivePoke = null;
     },
+
     unpause: function() {
         this.paused = false;
         this.stop();
         this.newEnemy();
         this.init();
     },
+
     stop: function() {
         window.clearTimeout(this.playerTimerId);
         window.clearTimeout(this.enemyTimerId);
     },
+
     refresh: function() {
         this.stop();
         this.init();
     },
+
     playerTimer: function() {
         const nextAttack = this.playerActivePoke.attackSpeed();
         this.playerTimerId = window.setTimeout(
@@ -43,6 +49,7 @@ const Combat = {
             nextAttack
         )
     },
+
     enemyTimer: function() {
         const nextAttack = this.enemyActivePoke.attackSpeed();
         this.enemyTimerId = window.setTimeout(
@@ -50,6 +57,7 @@ const Combat = {
             nextAttack
         )
     },
+
     calculateDamageMultiplier: function(attackingTypes, defendingTypes) {
         const typeEffectiveness = (attackingType, defendingTypes) =>
             TYPES[attackingType][defendingTypes[0]] * (defendingTypes[1] && TYPES[attackingType][defendingTypes[1]] || 1);
@@ -58,10 +66,12 @@ const Combat = {
             attackingTypes[1] && typeEffectiveness(attackingTypes[1], defendingTypes) || 0
         )
     },
+
     dealDamage: function(attacker, defender, who) {
         if (!attacker || !defender) return null;
         if (attacker.alive() && defender.alive()) {
             const consoleColor = (who === 'player') ? 'green' : 'rgb(207, 103, 59)';
+
             const missRNG = RNG(5);
             if (missRNG) {
                 dom.gameConsoleLog(attacker.pokeName() + ' missed!', consoleColor);
@@ -70,18 +80,22 @@ const Combat = {
                 const critMultiplier = (critRNG) ? 1 + (attacker.level() / 100) : 1;
                 const damageMultiplier = this.calculateDamageMultiplier(attacker.types(), defender.types()) * critMultiplier;
                 const damage = defender.takeDamage(attacker.avgAttack() * damageMultiplier);
+
                 if (critRNG) {
                     dom.gameConsoleLog('Critical Hit!!', consoleColor);
                 }
+
                 if (who === 'player') {
                     dom.gameConsoleLog(attacker.pokeName() + ' Attacked for ' + damage, 'green');
                     player.statistics.totalDamage += damage;
                 } else {
                     dom.gameConsoleLog(attacker.pokeName() + ' Attacked for ' + damage, 'rgb(207, 103, 59)');
                 }
+
                 dom.renderPokeOnContainer('enemy', enemy.activePoke());
                 dom.renderPokeOnContainer('player', player.activePoke(), player.settings.spriteChoice || 'back');
             }
+
             if (who === 'player') {
                 dom.attackAnimation('playerImg', 'right');
                 this.playerTimer();
@@ -90,48 +104,56 @@ const Combat = {
                 this.enemyTimer();
             }
         }
+
         if (!attacker.alive() || !defender.alive()) {
             window.clearTimeout(this.playerTimerId);
             window.clearTimeout(this.enemyTimerId);
 
-            if ((who === 'enemy') && !attacker.alive() ||
-                (who === 'player') && !defender.alive()) {
+            if ((who === 'enemy' && !attacker.alive()) ||
+                (who === 'player' && !defender.alive())) {
                 this.enemyFaint();
             } else {
-               this.playerFaint();
+                this.playerFaint();
             }
             dom.renderPokeOnContainer('enemy', enemy.activePoke());
         }
     },
+
     enemyFaint: function() {
         if (enemy.activePoke().shiny()) {
             player.statistics.shinyBeaten++;
         } else {
             player.statistics.beaten++;
         }
+
         this.attemptCatch();
         this.findPokeballs(enemy.activePoke().level());
         this.findCurrency(enemy.activePoke().level());
 
         const beforeExp = player.getPokemon().map((poke) => poke.level());
+
         const expToGive = (this.enemyActivePoke.baseExp() / 16) + (this.enemyActivePoke.level() * 3);
         player.statistics.totalExp += expToGive;
 
-        // ⭐ usa giveExpNoLevel en lugar de giveExp
+        // usar giveExpNoLevel en vez de giveExp
         this.playerActivePoke.giveExpNoLevel(expToGive);
         dom.gameConsoleLog(this.playerActivePoke.pokeName() + ' won ' + Math.floor(expToGive) + 'xp', 'rgb(153, 166, 11)');
 
         player.getPokemon().forEach((poke) => 
             poke.giveExpNoLevel((this.enemyActivePoke.baseExp() / 100) + (this.enemyActivePoke.level() / 10))
         );
+
         const afterExp = player.getPokemon().map((poke) => poke.level());
 
-        if (this.enemyActivePoke.pokeName() === "Ditto" ) {
-            this.playerActivePoke.giveExpNoLevel(100);
-            dom.gameConsoleLog(this.playerActivePoke.pokeName() + ' Ditto!', 'orange');
+        // Caso especial Ditto: +1 nivel exacto
+        if (this.enemyActivePoke.pokeName() === "Ditto") {
+            const expToNext = this.playerActivePoke.expToLevelUp ? this.playerActivePoke.expToLevelUp() : 0;
+            if (expToNext > 0) {
+                this.playerActivePoke.giveExpNoLevel(expToNext);
+            }
+            dom.gameConsoleLog(this.playerActivePoke.pokeName() + ' creció un nivel gracias a Ditto!', 'orange');
         }
 
-        // check de level up (opcional, puedes quitarlo si no quieres log)
         if (beforeExp.join('') !== afterExp.join('')) {
             dom.gameConsoleLog('Your pokemon gained a level', 'rgb(153, 166, 11)');
             if (player.settings.listView == 'roster') {
@@ -142,7 +164,7 @@ const Combat = {
         if (this.trainer) {
             this.trainerPoke.splice(this.trainerCurrentID, 1);
             if (this.trainerPoke.length < 1) {
-                dom.gameConsoleLog('You have defeated '+this.trainer.name, 'blue');
+                dom.gameConsoleLog('You have defeated ' + this.trainer.name, 'blue');
                 if (this.trainer.badge) {
                     if (!player.badges[this.trainer.badge]) {
                         player.badges[this.trainer.badge] = true;
@@ -162,6 +184,7 @@ const Combat = {
         this.playerTimer();
         dom.renderPokeOnContainer('player', player.activePoke(), player.settings.spriteChoice || 'back');
     },
+
     newEnemy: function() {
         if (combatLoop.trainer) {
             enemy.trainerPoke(combatLoop.trainerPoke);
@@ -176,6 +199,7 @@ const Combat = {
             player.statistics.seen++;
         }
     },
+
     playerFaint: function() {
         dom.gameConsoleLog(this.playerActivePoke.pokeName() + ' Fainted! ');
         const alivePokeIndexes = player.alivePokeIndexes();
@@ -199,6 +223,7 @@ const Combat = {
         }
         dom.renderPokeList(false);
     },
+
     attemptCatch: function() {
         if (this.catchEnabled == 'all' || (this.catchEnabled == 'new' && !player.hasPokemon(enemy.activePoke().pokeName(), 0)) || enemy.activePoke().shiny()) {
             dom.gameConsoleLog('Trying to catch ' + enemy.activePoke().pokeName() + '...', 'purple');
@@ -232,6 +257,7 @@ const Combat = {
             }
         }
     },
+
     findPokeballs: function(pokeLevel) {
         const ballsAmount = Math.floor(Math.random() * (pokeLevel/2)) + 1;
         const ballWeights = {
@@ -248,6 +274,7 @@ const Combat = {
             }
         }
     },
+
     findCurrency: function(pokeLevel) {
         if (RNG(5)) {
             const foundCurrency = Math.floor(Math.random() * pokeLevel * 4) + 1;
@@ -255,13 +282,16 @@ const Combat = {
             dom.gameConsoleLog('You found ¤' + foundCurrency + '!!', 'purple');
         }
     },
+
     changePlayerPoke: function(newPoke) {
         this.playerActivePoke = newPoke;
         this.refresh()
     },
+
     changeEnemyPoke: function(newPoke) {
         this.enemyActivePoke = newPoke;
         this.refresh()
     },
+
     changeCatch: function(shouldCatch) { this.catchEnabled = shouldCatch; }
 };
