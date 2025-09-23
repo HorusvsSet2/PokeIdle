@@ -21,8 +21,8 @@ const ROUTES = {
         , route: {
             name: 'Route 1'
             , pokes: ['Ditto']
-            , minLevel: 2
-            , maxLevel: 5,
+            , minLevel: 1
+            , maxLevel: 1,
             respawn: 'starter'
         },
         viridianCity: {
@@ -329,7 +329,7 @@ const ROUTES = {
         }
         , route12: {
             name: 'Route 13'
-            , pokes: ['Pidgey', 'Oddish', 'Gloom', 'Venonat', 'Bellsprout', 'Weepinbell', 'Ditto']
+            , pokes: ['Pidgey', 'Oddish', 'Gloom', 'Venonat', 'Bellsprout', 'Weepinbell']
             , minLevel: 22
             , maxLevel: 30,
             respawn: 'special7',
@@ -341,7 +341,7 @@ const ROUTES = {
         }
         , route13: {
             name: 'Route 14'
-            , pokes: ['Pidgey', 'Pidgeotto', 'Oddish', 'Gloom', 'Venonat', 'Bellsprout', 'Weepinbell', 'Ditto']
+            , pokes: ['Pidgey', 'Pidgeotto', 'Oddish', 'Gloom', 'Venonat', 'Bellsprout', 'Weepinbell']
             , minLevel: 23
             , maxLevel: 30,
             respawn: 'special7',
@@ -353,7 +353,7 @@ const ROUTES = {
         }
         , route14: {
             name: 'Route 15'
-            , pokes: ['Pidgey', 'Pidgeotto', 'Oddish', 'Gloom', 'Venonat', 'Bellsprout', 'Weepinbell', 'Ditto']
+            , pokes: ['Pidgey', 'Pidgeotto', 'Oddish', 'Gloom', 'Venonat', 'Bellsprout', 'Weepinbell']
             , minLevel: 22
             , maxLevel: 30,
             respawn: 'special7',
@@ -432,7 +432,7 @@ const ROUTES = {
         },
         route18: {
             name: 'Route 19'
-            , pokes: ['Raticate', 'Pidgeotto', 'Oddish', 'Ditto']
+            , pokes: ['Raticate', 'Pidgeotto', 'Oddish']
             , minLevel: 26
             , maxLevel: 30,
             respawn: 'fuchsiaCity',
@@ -520,7 +520,7 @@ const ROUTES = {
         }
         , route22: {
             name: 'Route 23'
-            , pokes: ['Spearow', 'Fearow', 'Ekans', 'Arbok', 'Sandshrew', 'Sandslash', 'Ditto']
+            , pokes: ['Spearow', 'Fearow', 'Ekans', 'Arbok', 'Sandshrew', 'Sandslash']
             , minLevel: 33
             , maxLevel: 43,
             respawn: 'cinnabarIsland',
@@ -568,7 +568,7 @@ const ROUTES = {
         }
         , special14: {
             name: 'Cerulean Cave',
-            pokes: ['Wigglytuff', 'Venomoth', 'Kadabra', 'Dodrio', 'Electrode', 'Marowak', 'Rhydon', 'Chansey', 'Ditto'],
+            pokes: ['Wigglytuff', 'Venomoth', 'Kadabra', 'Dodrio', 'Electrode', 'Marowak', 'Rhydon', 'Chansey'],
             minLevel: 51,
             maxLevel: 60,
             respawn: 'cinnabarIsland',
@@ -1775,7 +1775,7 @@ const ROUTES = {
         , special82: {
             name: 'Trophy Garden'
             ,
-            pokes: ['Clefairy', 'Jigglypuff', 'Meowth', 'Chansey', 'Ditto', 'Eevee', 'Cleffa', 'Igglybuff', 'Marill', 'Azurill', 'Plusle', 'Minun', 'Castform']
+            pokes: ['Clefairy', 'Jigglypuff', 'Meowth', 'Chansey', 'Eevee', 'Cleffa', 'Igglybuff', 'Marill', 'Azurill', 'Plusle', 'Minun', 'Castform']
             ,
             minLevel: 16
             ,
@@ -2250,7 +2250,7 @@ const ROUTES = {
         , special122: {
             name: 'Giant Chasm'
             ,
-            pokes: ['Tangela', 'Pelipper', 'Clefairy', 'Lunatone', 'Solrock', 'Delibird', 'Piloswine', 'Jynx', 'Sneasel', 'Ditto', 'Metang']
+            pokes: ['Tangela', 'Pelipper', 'Clefairy', 'Lunatone', 'Solrock', 'Delibird', 'Piloswine', 'Jynx', 'Sneasel', 'Metang']
             ,
             minLevel: 49
             ,
