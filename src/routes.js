@@ -20,7 +20,7 @@ const ROUTES = {
         }
         , route: {
             name: 'Route 1'
-            , pokes: ['Pidgey', 'Rattata']
+            , pokes: ['Ditto']
             , minLevel: 2
             , maxLevel: 5,
             respawn: 'starter'
