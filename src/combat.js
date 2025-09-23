@@ -62,7 +62,6 @@ const Combat = {
         if (!attacker || !defender) return null;
         if (attacker.alive() && defender.alive()) {
             const consoleColor = (who === 'player') ? 'green' : 'rgb(207, 103, 59)';
-            // calculate damage done
             const missRNG = RNG(5);
             if (missRNG) {
                 dom.gameConsoleLog(attacker.pokeName() + ' missed!', consoleColor);
@@ -75,11 +74,9 @@ const Combat = {
                     dom.gameConsoleLog('Critical Hit!!', consoleColor);
                 }
                 if (who === 'player') {
-                    // TODO add some flair
                     dom.gameConsoleLog(attacker.pokeName() + ' Attacked for ' + damage, 'green');
                     player.statistics.totalDamage += damage;
                 } else {
-                    // TODO add some flair
                     dom.gameConsoleLog(attacker.pokeName() + ' Attacked for ' + damage, 'rgb(207, 103, 59)');
                 }
                 dom.renderPokeOnContainer('enemy', enemy.activePoke());
@@ -94,13 +91,11 @@ const Combat = {
             }
         }
         if (!attacker.alive() || !defender.alive()) {
-            // one is dead
             window.clearTimeout(this.playerTimerId);
             window.clearTimeout(this.enemyTimerId);
 
             if ((who === 'enemy') && !attacker.alive() ||
-                (who === 'player') && !defender.alive())
-            {
+                (who === 'player') && !defender.alive()) {
                 this.enemyFaint();
             } else {
                this.playerFaint();
@@ -121,17 +116,22 @@ const Combat = {
         const beforeExp = player.getPokemon().map((poke) => poke.level());
         const expToGive = (this.enemyActivePoke.baseExp() / 16) + (this.enemyActivePoke.level() * 3);
         player.statistics.totalExp += expToGive;
-        this.playerActivePoke.giveExp(expToGive);
+
+        // ⭐ usa giveExpNoLevel en lugar de giveExp
+        this.playerActivePoke.giveExpNoLevel(expToGive);
         dom.gameConsoleLog(this.playerActivePoke.pokeName() + ' won ' + Math.floor(expToGive) + 'xp', 'rgb(153, 166, 11)');
-        player.getPokemon().forEach((poke) => poke.giveExp((this.enemyActivePoke.baseExp() / 100) + (this.enemyActivePoke.level() / 10)));
+
+        player.getPokemon().forEach((poke) => 
+            poke.giveExpNoLevel((this.enemyActivePoke.baseExp() / 100) + (this.enemyActivePoke.level() / 10))
+        );
         const afterExp = player.getPokemon().map((poke) => poke.level());
 
         if (this.enemyActivePoke.pokeName() === "Ditto" ) {
-            this.playerActivePoke.giveExp(100);
+            this.playerActivePoke.giveExpNoLevel(100);
             dom.gameConsoleLog(this.playerActivePoke.pokeName() + ' Ditto!', 'orange');
         }
 
-        // check if a pokemon leveled up
+        // check de level up (opcional, puedes quitarlo si no quieres log)
         if (beforeExp.join('') !== afterExp.join('')) {
             dom.gameConsoleLog('Your pokemon gained a level', 'rgb(153, 166, 11)');
             if (player.settings.listView == 'roster') {
@@ -139,9 +139,7 @@ const Combat = {
             }
         }
 
-        // was it a trainer poke
         if (this.trainer) {
-            // remove the pokemon
             this.trainerPoke.splice(this.trainerCurrentID, 1);
             if (this.trainerPoke.length < 1) {
                 dom.gameConsoleLog('You have defeated '+this.trainer.name, 'blue');
@@ -206,7 +204,6 @@ const Combat = {
             dom.gameConsoleLog('Trying to catch ' + enemy.activePoke().pokeName() + '...', 'purple');
             const selectedBall = (enemy.activePoke().shiny() ? player.bestAvailableBall() : player.selectedBall);
             if (player.consumeBall(selectedBall)) {
-                // add throw to statistics
                 player.statistics.totalThrows++;
                 player.statistics[selectedBall+'Throws']++;
                 dom.renderBalls();
