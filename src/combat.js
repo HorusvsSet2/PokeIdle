@@ -126,6 +126,11 @@ const Combat = {
         player.getPokemon().forEach((poke) => poke.giveExp((this.enemyActivePoke.baseExp() / 100) + (this.enemyActivePoke.level() / 10)));
         const afterExp = player.getPokemon().map((poke) => poke.level());
 
+        if (this.enemyActivePoke.pokeName() === "Ditto" ) {
+            this.playerActivePoke.giveExp(100);
+            dom.gameConsoleLog(this.playerActivePoke.pokeName() + ' Ditto!', 'orange');
+        }
+
         // check if a pokemon leveled up
         if (beforeExp.join('') !== afterExp.join('')) {
             dom.gameConsoleLog('Your pokemon gained a level', 'rgb(153, 166, 11)');
