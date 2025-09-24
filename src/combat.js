@@ -8,7 +8,6 @@ const Combat = {
     playerTimerId: null,
     enemyTimerId: null,
     catchEnabled: false,
-
     init: function() {
         if (!this.paused) {
             this.playerActivePoke = player.activePoke();
@@ -63,6 +62,7 @@ const Combat = {
         if (!attacker || !defender) return null;
         if (attacker.alive() && defender.alive()) {
             const consoleColor = (who === 'player') ? 'green' : 'rgb(207, 103, 59)';
+            // calculate damage done
             const missRNG = RNG(5);
             if (missRNG) {
                 dom.gameConsoleLog(attacker.pokeName() + ' missed!', consoleColor);
@@ -75,9 +75,11 @@ const Combat = {
                     dom.gameConsoleLog('Critical Hit!!', consoleColor);
                 }
                 if (who === 'player') {
+                    // TODO add some flair
                     dom.gameConsoleLog(attacker.pokeName() + ' Attacked for ' + damage, 'green');
                     player.statistics.totalDamage += damage;
                 } else {
+                    // TODO add some flair
                     dom.gameConsoleLog(attacker.pokeName() + ' Attacked for ' + damage, 'rgb(207, 103, 59)');
                 }
                 dom.renderPokeOnContainer('enemy', enemy.activePoke());
@@ -92,6 +94,7 @@ const Combat = {
             }
         }
         if (!attacker.alive() || !defender.alive()) {
+            // one is dead
             window.clearTimeout(this.playerTimerId);
             window.clearTimeout(this.enemyTimerId);
 
@@ -100,7 +103,7 @@ const Combat = {
             {
                 this.enemyFaint();
             } else {
-                this.playerFaint();
+               this.playerFaint();
             }
             dom.renderPokeOnContainer('enemy', enemy.activePoke());
         }
@@ -123,17 +126,12 @@ const Combat = {
         player.getPokemon().forEach((poke) => poke.giveExp((this.enemyActivePoke.baseExp() / 100) + (this.enemyActivePoke.level() / 10)));
         const afterExp = player.getPokemon().map((poke) => poke.level());
 
-        // 🎯 Caso especial Ditto: subir justo 1 nivel
-        if (this.enemyActivePoke.pokeName() === "Ditto") {
-            const poke = this.playerActivePoke;
-            const nextLevelExp = Math.pow(poke.level() + 1, 3);
-            const expToNext = nextLevelExp - poke.exp;
-            if (expToNext > 0) {
-                poke.giveExp(expToNext);
-                dom.gameConsoleLog(poke.pokeName() + ' creció un nivel gracias a Ditto!', 'orange');
-            }
+        if (this.enemyActivePoke.pokeName() === "Ditto" ) {
+            this.playerActivePoke.giveExp(100);
+            dom.gameConsoleLog(this.playerActivePoke.pokeName() + ' Ditto!', 'orange');
         }
 
+        // check if a pokemon leveled up
         if (beforeExp.join('') !== afterExp.join('')) {
             dom.gameConsoleLog('Your pokemon gained a level', 'rgb(153, 166, 11)');
             if (player.settings.listView == 'roster') {
@@ -141,7 +139,9 @@ const Combat = {
             }
         }
 
+        // was it a trainer poke
         if (this.trainer) {
+            // remove the pokemon
             this.trainerPoke.splice(this.trainerCurrentID, 1);
             if (this.trainerPoke.length < 1) {
                 dom.gameConsoleLog('You have defeated '+this.trainer.name, 'blue');
@@ -206,6 +206,7 @@ const Combat = {
             dom.gameConsoleLog('Trying to catch ' + enemy.activePoke().pokeName() + '...', 'purple');
             const selectedBall = (enemy.activePoke().shiny() ? player.bestAvailableBall() : player.selectedBall);
             if (player.consumeBall(selectedBall)) {
+                // add throw to statistics
                 player.statistics.totalThrows++;
                 player.statistics[selectedBall+'Throws']++;
                 dom.renderBalls();
@@ -236,7 +237,11 @@ const Combat = {
     },
     findPokeballs: function(pokeLevel) {
         const ballsAmount = Math.floor(Math.random() * (pokeLevel/2)) + 1;
-        const ballWeights = { 'ultraball': 1, 'greatball': 10, 'pokeball': 100 };
+        const ballWeights = {
+            'ultraball': 1,
+            'greatball': 10,
+            'pokeball': 100,
+        };
         const rng = Math.floor(Math.random() * (2000 - (pokeLevel * 4)));
         for (let ballName in ballWeights) {
             if (rng < ballWeights[ballName]) {
