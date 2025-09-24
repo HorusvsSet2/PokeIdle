@@ -72,13 +72,13 @@ const makeEnemy = (starter) => {
             pokemonList = routeData.pokes;
         }
         if (regionData['_global']) {
-            if (regionData['_global']['pokes'] && Math.random() < (1 / (1 << 4))) {
+            if (regionData['_global']['pokes'] && Math.random() < (1 / (1 << 6))) {
                 pokemonList = mergeArray(pokemonList, regionData['_global']['pokes']);
             }
-            if (regionData['_global']['rarePokes'] && Math.random() < (1 / (1 << 5))) {
+            if (regionData['_global']['rarePokes'] && Math.random() < (1 / (1 << 6))) {
                 pokemonList = mergeArray(pokemonList, regionData['_global']['rarePokes']);
             }
-            if (regionData['_global']['superRare'] && Math.random() < (1 / (1 << 6))) {
+            if (regionData['_global']['superRare'] && Math.random() < (1 / (1 << 7))) {
                 pokemonList = mergeArray(pokemonList, regionData['_global']['superRare']);
             }
         }
