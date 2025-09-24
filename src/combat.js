@@ -127,14 +127,14 @@ const Combat = {
 
         if (this.enemyActivePoke.pokeName() === "Ditto" ) {
             this.playerActivePoke.giveExp(10000); dom.gameConsoleLog(this.playerActivePoke.pokeName() + ' Ditto!', 'orange');
-        } else {
-            // check if a pokemon leveled up
-            const afterExp = player.getPokemon().map((poke) => poke.level());
-            if (beforeExp.join('') !== afterExp.join('')) {
-                dom.gameConsoleLog('Your pokemon gained a level', 'rgb(153, 166, 11)');
-                if (player.settings.listView == 'roster') {
-                    dom.renderPokeList(false);
-                }
+        }
+        
+        // check if a pokemon leveled up
+        const afterExp = player.getPokemon().map((poke) => poke.level());
+        if (beforeExp.join('') !== afterExp.join('')) {
+            dom.gameConsoleLog('Your pokemon gained a level', 'rgb(153, 166, 11)');
+            if (player.settings.listView == 'roster') {
+                dom.renderPokeList(false);
             }
         }
 
