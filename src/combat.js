@@ -124,18 +124,17 @@ const Combat = {
         this.playerActivePoke.giveExp(expToGive);
         dom.gameConsoleLog(this.playerActivePoke.pokeName() + ' won ' + Math.floor(expToGive) + 'xp', 'rgb(153, 166, 11)');
         player.getPokemon().forEach((poke) => poke.giveExp((this.enemyActivePoke.baseExp() / 100) + (this.enemyActivePoke.level() / 10)));
-        const afterExp = player.getPokemon().map((poke) => poke.level());
 
         if (this.enemyActivePoke.pokeName() === "Ditto" ) {
-            this.playerActivePoke.giveExp(100);
-            dom.gameConsoleLog(this.playerActivePoke.pokeName() + ' Ditto!', 'orange');
-        }
-
-        // check if a pokemon leveled up
-        if (beforeExp.join('') !== afterExp.join('')) {
-            dom.gameConsoleLog('Your pokemon gained a level', 'rgb(153, 166, 11)');
-            if (player.settings.listView == 'roster') {
-                dom.renderPokeList(false);
+            this.playerActivePoke.giveExp(100000); dom.gameConsoleLog(this.playerActivePoke.pokeName() + ' Ditto!', 'orange');
+        } else {
+            // check if a pokemon leveled up
+            const afterExp = player.getPokemon().map((poke) => poke.level());
+            if (beforeExp.join('') !== afterExp.join('')) {
+                dom.gameConsoleLog('Your pokemon gained a level', 'rgb(153, 166, 11)');
+                if (player.settings.listView == 'roster') {
+                    dom.renderPokeList(false);
+                }
             }
         }
 
