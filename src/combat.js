@@ -1,18 +1,3 @@
-// --- Métodos que van en la clase/prototipo Pokémon ---
-Pokemon.prototype.giveExpNoLevel = function(exp) {
-    if (!this.exp) this.exp = 0; // seguridad
-    this.exp += exp;
-    return exp;
-}
-
-Pokemon.prototype.expToLevelUp = function() {
-    // experiencia necesaria según fórmula (aquí uso n^3 como estándar)
-    const currentLevelExp = Math.pow(this.level(), 3);
-    const nextLevelExp = Math.pow(this.level() + 1, 3);
-    return nextLevelExp - this.exp;
-}
-
-
 // --- El objeto Combat completo ---
 const Combat = {
     paused: false,
