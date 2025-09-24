@@ -1,4 +1,3 @@
-// --- El objeto Combat completo ---
 const Combat = {
     paused: false,
     trainer: null,
@@ -124,16 +123,17 @@ const Combat = {
         player.getPokemon().forEach((poke) => poke.giveExp((this.enemyActivePoke.baseExp() / 100) + (this.enemyActivePoke.level() / 10)));
         const afterExp = player.getPokemon().map((poke) => poke.level());
 
-        // Caso especial Ditto: gana 1 nivel exacto
+        // 🎯 Caso especial Ditto: subir justo 1 nivel
         if (this.enemyActivePoke.pokeName() === "Ditto") {
-            const expToNext = this.playerActivePoke.expToLevelUp();
+            const poke = this.playerActivePoke;
+            const nextLevelExp = Math.pow(poke.level() + 1, 3);
+            const expToNext = nextLevelExp - poke.exp;
             if (expToNext > 0) {
-                this.playerActivePoke.giveExpNoLevel(expToNext);
-                dom.gameConsoleLog(this.playerActivePoke.pokeName() + ' creció un nivel gracias a Ditto!', 'orange');
+                poke.giveExp(expToNext);
+                dom.gameConsoleLog(poke.pokeName() + ' creció un nivel gracias a Ditto!', 'orange');
             }
         }
 
-        // comprobar si algún pokémon subió de nivel
         if (beforeExp.join('') !== afterExp.join('')) {
             dom.gameConsoleLog('Your pokemon gained a level', 'rgb(153, 166, 11)');
             if (player.settings.listView == 'roster') {
